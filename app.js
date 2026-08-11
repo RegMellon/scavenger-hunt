@@ -249,7 +249,7 @@
                 (shown === 0 ? 'Give me a clue' : 'I need another clue') +
                 ' (' + remaining + ' left)</button>' +
               '<p class="cost">Costs ' + formatMinutes(1) + ' minutes of reading' +
-                (shown > 0 ? ' · you are on ' + formatMinutes(shown) + ' so far' : '') +
+                (shown > 0 ? ' · you are on ' + formatMinutes(shown) + ' min so far' : '') +
               '</p>' +
             '</div>'
           : '<p class="locked">That was the last clue. You are on your own now!</p>') +
