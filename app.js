@@ -66,15 +66,22 @@
 
   // --- scoring ------------------------------------------------------------
 
-  var MAX_POINTS = 100;
-  var CLUE_COST = 15;
-
-  function pointsFor(p) {
-    return p.found ? Math.max(25, MAX_POINTS - p.clues * CLUE_COST) : 0;
-  }
+  var POINTS_PER_STAR = 2.5;
 
   function starsFor(p) {
     return Math.max(1, 5 - p.clues);
+  }
+
+  // Stars are what actually get counted; totals accumulate as integers and are
+  // converted to points by a single multiply at display time, so no float
+  // arithmetic ever accumulates.
+  function starScore(p) {
+    return p.found ? starsFor(p) : 0;
+  }
+
+  function formatPoints(stars) {
+    var points = stars * POINTS_PER_STAR;
+    return Number.isInteger(points) ? String(points) : points.toFixed(1);
   }
 
   var RANKS = [
@@ -145,13 +152,13 @@
   function hubView() {
     var found = 0;
     var cluesUsed = 0;
-    var points = 0;
+    var starsEarned = 0;
 
     var cards = HUNT.figures.map(function (fig) {
       var p = progressOf(fig.id);
       if (p.found) found++;
       cluesUsed += p.clues;
-      points += pointsFor(p);
+      starsEarned += starScore(p);
 
       var meta = p.found
         ? '★'.repeat(starsFor(p)) + '☆'.repeat(5 - starsFor(p)) +
@@ -185,7 +192,7 @@
           '<div class="rank">' + esc(rank.title) + '</div>' +
           '<p><strong>' + esc(rank.line) + '</strong></p>' +
           '<p class="sub">All ' + total + ' found using ' + plural(cluesUsed, 'clue', 'clues') +
-            ' · ' + points + ' points</p>' +
+            ' · ' + formatPoints(starsEarned) + ' points</p>' +
         '</div>';
     }
 
@@ -202,7 +209,7 @@
         '<div class="bar"><div class="bar-fill' + fillClass + '" style="width:' + pct + '%"></div></div>' +
         '<div class="scoreboard-row" style="margin:12px 0 0">' +
           '<span class="sub">' + plural(cluesUsed, 'clue', 'clues') + ' used</span>' +
-          '<span class="sub">' + points + ' points</span>' +
+          '<span class="sub">' + formatPoints(starsEarned) + ' points</span>' +
         '</div>' +
       '</section>' +
       '<div class="cards">' + cards + '</div>' +
@@ -234,7 +241,7 @@
           '<p class="stars" style="font-size:22px">' +
             '★'.repeat(starsFor(p)) + '☆'.repeat(5 - starsFor(p)) + '</p>' +
           '<p class="sub">' + plural(p.clues, 'clue', 'clues') + ' used · ' +
-            pointsFor(p) + ' points</p>' +
+            formatPoints(starScore(p)) + ' points</p>' +
         '</div>' +
         '<div class="stack">' +
           '<button class="btn" data-go="">Back to the hunt</button>' +

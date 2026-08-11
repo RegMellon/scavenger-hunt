@@ -16,9 +16,11 @@ No accounts, no server, no build step for players — just open the page.
 4. Find all four to unlock a rank based on your total clues used, from *Never Gave Up*
    up to *Legendary Seeker*.
 
-Scoring is 100 points per figure, minus 15 per clue, floored at 25. Stars are `5 − clues used`
-(minimum 1). Progress lives in `localStorage` under `scavengerHunt.v1`, so each kid's
-phone or tablet keeps its own score, and **Start over** wipes it.
+Stars are `5 − clues used`, minimum 1, and each star is worth **2.5 points** — so a figure
+found with no clues at all is 5 stars and 12.5 points, and a perfect hunt is 20 stars and
+50 points. Totals accumulate as whole stars and are multiplied out once for display, so the
+arithmetic never drifts. Progress lives in `localStorage` under `scavengerHunt.v1`, so each
+kid's phone or tablet keeps its own score, and **Start over** wipes it.
 
 ## Editing the clues
 
