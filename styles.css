@@ -276,6 +276,14 @@ p:last-child { margin-bottom: 0; }
   to   { opacity: 1; transform: none; }
 }
 
+.cost {
+  margin: -2px 0 0;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--muted);
+}
+
 .locked {
   text-align: center;
   color: var(--muted);

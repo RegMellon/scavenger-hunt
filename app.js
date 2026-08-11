@@ -66,22 +66,18 @@
 
   // --- scoring ------------------------------------------------------------
 
-  var POINTS_PER_STAR = 2.5;
+  // Every clue taken costs 2.5 minutes of reading time. Clue counts accumulate as
+  // whole numbers and are multiplied out once at display time, so no float
+  // arithmetic ever accumulates.
+  var MINUTES_PER_CLUE = 2.5;
 
   function starsFor(p) {
     return Math.max(1, 5 - p.clues);
   }
 
-  // Stars are what actually get counted; totals accumulate as integers and are
-  // converted to points by a single multiply at display time, so no float
-  // arithmetic ever accumulates.
-  function starScore(p) {
-    return p.found ? starsFor(p) : 0;
-  }
-
-  function formatPoints(stars) {
-    var points = stars * POINTS_PER_STAR;
-    return Number.isInteger(points) ? String(points) : points.toFixed(1);
+  function formatMinutes(clues) {
+    var minutes = clues * MINUTES_PER_CLUE;
+    return Number.isInteger(minutes) ? String(minutes) : minutes.toFixed(1);
   }
 
   var RANKS = [
@@ -152,13 +148,11 @@
   function hubView() {
     var found = 0;
     var cluesUsed = 0;
-    var starsEarned = 0;
 
     var cards = HUNT.figures.map(function (fig) {
       var p = progressOf(fig.id);
       if (p.found) found++;
       cluesUsed += p.clues;
-      starsEarned += starScore(p);
 
       var meta = p.found
         ? '★'.repeat(starsFor(p)) + '☆'.repeat(5 - starsFor(p)) +
@@ -192,7 +186,7 @@
           '<div class="rank">' + esc(rank.title) + '</div>' +
           '<p><strong>' + esc(rank.line) + '</strong></p>' +
           '<p class="sub">All ' + total + ' found using ' + plural(cluesUsed, 'clue', 'clues') +
-            ' · ' + formatPoints(starsEarned) + ' points</p>' +
+            ' · ' + formatMinutes(cluesUsed) + ' minutes of reading</p>' +
         '</div>';
     }
 
@@ -209,7 +203,7 @@
         '<div class="bar"><div class="bar-fill' + fillClass + '" style="width:' + pct + '%"></div></div>' +
         '<div class="scoreboard-row" style="margin:12px 0 0">' +
           '<span class="sub">' + plural(cluesUsed, 'clue', 'clues') + ' used</span>' +
-          '<span class="sub">' + formatPoints(starsEarned) + ' points</span>' +
+          '<span class="sub">' + formatMinutes(cluesUsed) + ' min reading</span>' +
         '</div>' +
       '</section>' +
       '<div class="cards">' + cards + '</div>' +
@@ -241,7 +235,7 @@
           '<p class="stars" style="font-size:22px">' +
             '★'.repeat(starsFor(p)) + '☆'.repeat(5 - starsFor(p)) + '</p>' +
           '<p class="sub">' + plural(p.clues, 'clue', 'clues') + ' used · ' +
-            formatPoints(starScore(p)) + ' points</p>' +
+            formatMinutes(p.clues) + ' min reading</p>' +
         '</div>' +
         '<div class="stack">' +
           '<button class="btn" data-go="">Back to the hunt</button>' +
@@ -254,6 +248,9 @@
               '<button class="btn btn-clue" data-action="clue" data-id="' + esc(fig.id) + '">' +
                 (shown === 0 ? 'Give me a clue' : 'I need another clue') +
                 ' (' + remaining + ' left)</button>' +
+              '<p class="cost">Costs ' + formatMinutes(1) + ' minutes of reading' +
+                (shown > 0 ? ' · you are on ' + formatMinutes(shown) + ' so far' : '') +
+              '</p>' +
             '</div>'
           : '<p class="locked">That was the last clue. You are on your own now!</p>') +
         '<div class="stack">' +

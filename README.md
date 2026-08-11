@@ -12,13 +12,16 @@ No accounts, no server, no build step for players — just open the page.
    no actual information in it.
 2. Tap a figure to open it. You can take clues one at a time: **1 → 5**, vague to obvious.
    Clue 5 always gives the hiding place away, so nobody stays stuck.
-3. Tap **I FOUND IT!** when you've got it. Confetti, stars, points.
+3. Tap **I FOUND IT!** when you've got it. Confetti and stars.
 4. Find all four to unlock a rank based on your total clues used, from *Never Gave Up*
    up to *Legendary Seeker*.
 
-Stars are `5 − clues used`, minimum 1, and each star is worth **2.5 points** — so a figure
-found with no clues at all is 5 stars and 12.5 points, and a perfect hunt is 20 stars and
-50 points. Totals accumulate as whole stars and are multiplied out once for display, so the
+**Every clue costs 2.5 minutes of reading time.** The cost is shown on the clue button before
+they commit to it, and the running total sits on the scoreboard — so taking a fourth clue is
+a real decision, not a free one. Take none and you owe nothing; burn all twenty and it is
+50 minutes. Stars (`5 − clues used`, minimum 1) are the reward side of the same number.
+
+Clue counts accumulate as whole numbers and are multiplied out once for display, so the
 arithmetic never drifts. Progress lives in `localStorage` under `scavengerHunt.v1`, so each
 kid's phone or tablet keeps its own score, and **Start over** wipes it.
 
