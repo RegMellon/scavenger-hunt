@@ -206,7 +206,7 @@
         '</div>' +
       '</section>' +
       '<div class="cards">' + cards + '</div>' +
-      '<div class="footer"><button class="btn btn-ghost" data-action="ask-reset">Start over</button></div>';
+      '<div class="footer"><button class="btn btn-ghost" data-action="ask-reset">Start over 🔒</button></div>';
   }
 
   function figureView(fig) {
@@ -269,14 +269,84 @@
     return '' +
       '<div class="modal-backdrop" data-action="cancel-reset">' +
         '<div class="modal">' +
-          '<h2>Start over?</h2>' +
-          '<p>This wipes every find and every clue count. There is no undo.</p>' +
-          '<div class="btn-row" style="margin-top:18px">' +
+          '<h2>Grown-ups only</h2>' +
+          '<p>Starting over wipes every find and every clue count. There is no undo.</p>' +
+          '<input id="reset-pw" class="pw-input" type="password" autocomplete="off"' +
+            ' autocapitalize="off" autocorrect="off" spellcheck="false"' +
+            ' placeholder="Password" aria-label="Password">' +
+          '<p id="reset-error" class="pw-error" role="alert"></p>' +
+          '<div class="btn-row" style="margin-top:14px">' +
             '<button class="btn" data-action="cancel-reset">Never mind</button>' +
             '<button class="btn btn-danger" data-action="do-reset">Wipe it</button>' +
           '</div>' +
         '</div>' +
       '</div>';
+  }
+
+  // --- reset password -----------------------------------------------------
+  // Only a salted SHA-256 of the password ships (see tools/build.ps1); the word
+  // itself lives in the gitignored clues.json and never reaches the public repo.
+
+  var RESET_SALT = 'scavenger-hunt-reset::';
+  var resetBusy = false;
+
+  function sha256Hex(text) {
+    var bytes = new TextEncoder().encode(text);
+    return crypto.subtle.digest('SHA-256', bytes).then(function (buffer) {
+      return Array.prototype.map.call(new Uint8Array(buffer), function (b) {
+        return b.toString(16).padStart(2, '0');
+      }).join('');
+    });
+  }
+
+  function showResetError(message) {
+    var field = document.getElementById('reset-pw');
+    var slot = document.getElementById('reset-error');
+    if (slot) slot.textContent = message;
+    if (field) {
+      field.value = '';
+      field.classList.remove('shake');
+      void field.offsetWidth;        // restart the animation on a repeat wrong guess
+      field.classList.add('shake');
+      field.focus();
+    }
+  }
+
+  function attemptReset() {
+    if (resetBusy) return;
+
+    var field = document.getElementById('reset-pw');
+    var typed = field ? field.value.trim().toLowerCase() : '';
+    if (!typed) {
+      showResetError('Type the password first.');
+      return;
+    }
+
+    // crypto.subtle only exists in a secure context (https, or localhost).
+    if (!window.crypto || !crypto.subtle) {
+      showResetError('Open the site over https to use the password.');
+      return;
+    }
+
+    resetBusy = true;
+    sha256Hex(RESET_SALT + typed).then(function (hash) {
+      resetBusy = false;
+      if (hash !== HUNT.pw) {
+        showResetError('That is not it.');
+        return;
+      }
+      state = {};
+      saveState(state);
+      pendingReset = false;
+      if (currentId()) {
+        location.hash = '';          // hashchange -> render
+      } else {
+        render();
+      }
+    }).catch(function () {
+      resetBusy = false;
+      showResetError('Could not check the password. Try again.');
+    });
   }
 
   // --- render / routing ---------------------------------------------------
@@ -298,6 +368,11 @@
 
     app.innerHTML = (fig ? figureView(fig) : hubView()) + (pendingReset ? resetModal() : '');
     window.scrollTo(0, 0);
+
+    if (pendingReset) {
+      var field = document.getElementById('reset-pw');
+      if (field) field.focus();
+    }
   }
 
   app.addEventListener('click', function (event) {
@@ -351,11 +426,15 @@
       render();
 
     } else if (action === 'do-reset') {
-      state = {};
-      saveState(state);
-      pendingReset = false;
-      location.hash = '';
-      render();
+      attemptReset();
+    }
+  });
+
+  // Enter in the password box submits, so a phone keyboard's Go key works.
+  app.addEventListener('keydown', function (event) {
+    if (event.key === 'Enter' && event.target.id === 'reset-pw') {
+      event.preventDefault();
+      attemptReset();
     }
   });
 

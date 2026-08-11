@@ -50,6 +50,34 @@ badge and clue stripes. You can add or remove figures freely — the hub, the pr
 and the rank thresholds all count off the array. Five clues per figure is the intended
 rhythm, not a hard limit.
 
+## The Start over password
+
+**Start over 🔒** is gated, so a kid who is losing can't quietly wipe the board. Tapping it
+asks for a password; a wrong answer shakes the box and leaves every score untouched.
+
+Set it in `clues.json` and rebuild:
+
+```json
+"resetPassword": "whatever-you-pick"
+```
+
+```powershell
+pwsh tools/build.ps1
+```
+
+Only a salted SHA-256 hash of the password reaches `data.js` — unlike the clues, the
+password is genuinely not recoverable from the published site. (Which is also why this
+README does not name it.) Leading/trailing spaces and capitalisation are ignored, so
+`  Hunt-Word ` and `hunt-word` both work.
+
+Two consequences worth knowing:
+
+- **Lose `clues.json` and you lose the password.** `-Decode` can recover the clue text, but
+  not this — a hash only goes one way. Set a new one and rebuild.
+- The check needs `crypto.subtle`, which browsers only expose over **https** or on
+  `localhost`. On the live GitHub Pages site that is always true. If you open `index.html`
+  straight off disk, the password box will tell you to use the https site instead.
+
 ## Why the clues are scrambled
 
 `data.js` ships with every clue XOR'd and base64'd, because the target audience is old

@@ -32,6 +32,9 @@ $prefix    = 'window.HUNT='
 
 $key = [Text.Encoding]::UTF8.GetBytes('a-star-in-the-east-2026')
 
+# Must match RESET_SALT in app.js.
+$pwSalt = 'scavenger-hunt-reset::'
+
 function Protect-Text {
     param([AllowEmptyString()][string]$Text)
     $bytes = [Text.Encoding]::UTF8.GetBytes($Text)
@@ -66,6 +69,7 @@ if ($Decode) {
 
     "TITLE:    $($hunt.title)"
     "SUBTITLE: $($hunt.subtitle)"
+    "RESET PW: (hashed, not recoverable — set a new one in clues.json and rebuild)"
     foreach ($f in $hunt.figures) {
         ''
         "=== $($f.emoji) $($f.name)  [$($f.id)] ==="
@@ -86,6 +90,19 @@ try   { $src = Get-Content $cluesPath -Raw | ConvertFrom-Json }
 catch { throw "clues.json is not valid JSON: $($_.Exception.Message)" }
 
 if (-not $src.figures) { throw "clues.json has no 'figures' array." }
+
+if ([string]::IsNullOrWhiteSpace($src.resetPassword)) {
+    throw "clues.json needs a 'resetPassword' — it guards the Start over button so kids cannot wipe the game."
+}
+
+# Only the hash ships. Trimmed and lowercased so a parent typing on a phone
+# keyboard is not defeated by autocapitalisation; app.js normalises identically.
+$pwNormalised = $src.resetPassword.Trim().ToLowerInvariant()
+$pwHash = [Convert]::ToHexString(
+    [Security.Cryptography.SHA256]::HashData(
+        [Text.Encoding]::UTF8.GetBytes("$pwSalt$pwNormalised")
+    )
+).ToLowerInvariant()
 
 $figures = foreach ($f in $src.figures) {
     foreach ($field in 'id', 'name', 'emoji', 'teaser', 'answer') {
@@ -111,6 +128,7 @@ $figures = foreach ($f in $src.figures) {
 $hunt = [ordered]@{
     title    = $src.title
     subtitle = $src.subtitle
+    pw       = $pwHash
     figures  = @($figures)
 }
 
@@ -126,3 +144,4 @@ Set-Content -Path $dataPath -Value "$banner`n$prefix$json;`n" -Encoding utf8NoBO
 $clueCount = ($src.figures | Measure-Object -Property { $_.clues.Count } -Sum).Sum
 "Wrote $dataPath"
 "  $($src.figures.Count) figures, $clueCount clues, all scrambled."
+"  Reset password hashed ($($pwHash.Substring(0,12))...); the word itself stays in clues.json."

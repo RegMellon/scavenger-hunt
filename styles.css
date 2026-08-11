@@ -336,6 +336,45 @@ p:last-child { margin-bottom: 0; }
 
 .modal h2 { margin-bottom: 10px; }
 
+.pw-input {
+  width: 100%;
+  margin-top: 16px;
+  padding: 13px 15px;
+  font: inherit;
+  font-weight: 800;
+  text-align: center;
+  letter-spacing: .08em;
+  color: var(--ink);
+  background: var(--bg);
+  border: var(--edge);
+  border-radius: 14px;
+  box-shadow: inset 2px 2px 0 rgba(36, 28, 19, .12);
+}
+
+.pw-input:focus {
+  outline: none;
+  border-color: var(--purple);
+  box-shadow: 0 0 0 3px rgba(139, 109, 234, .35);
+}
+
+.pw-input.shake { animation: shake .38s ease; }
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%      { transform: translateX(-7px); }
+  40%      { transform: translateX(7px); }
+  60%      { transform: translateX(-4px); }
+  80%      { transform: translateX(4px); }
+}
+
+.pw-error {
+  min-height: 20px;
+  margin: 8px 0 0;
+  font-size: 14px;
+  font-weight: 800;
+  color: #C6295C;
+}
+
 /* ---------- confetti ---------- */
 
 .confetti {
