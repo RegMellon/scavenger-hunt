@@ -1,0 +1,374 @@
+/* Scavenger Hunt — bright, chunky, thumb-friendly. Mobile first. */
+
+:root {
+  --bg:      #FFF3D6;
+  --ink:     #241C13;
+  --paper:   #FFFFFF;
+  --muted:   #7A6A55;
+
+  --teal:    #35C4B5;
+  --gold:    #FFC93C;
+  --pink:    #FF6B9D;
+  --purple:  #8B6DEA;
+  --green:   #4CD07D;
+
+  --accent:  var(--teal);
+
+  --edge:    3px solid var(--ink);
+  --radius:  18px;
+  --pop:     5px 5px 0 var(--ink);
+  --pop-sm:  3px 3px 0 var(--ink);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg);
+  background-image: radial-gradient(circle at 1px 1px, rgba(36, 28, 19, .10) 1px, transparent 0);
+  background-size: 22px 22px;
+  color: var(--ink);
+  font-family: "Nunito", "Baloo 2", "Trebuchet MS", "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-size: 17px;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+.app {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 20px 16px 64px;
+}
+
+/* ---------- type ---------- */
+
+h1, h2, h3 { margin: 0; line-height: 1.15; font-weight: 900; letter-spacing: -.02em; }
+h1 { font-size: clamp(30px, 8vw, 44px); }
+h2 { font-size: clamp(22px, 5.5vw, 28px); }
+h3 { font-size: 19px; }
+p  { margin: 0 0 12px; }
+p:last-child { margin-bottom: 0; }
+
+.sub    { color: var(--muted); font-weight: 700; font-size: 15px; }
+.center { text-align: center; }
+
+/* ---------- masthead ---------- */
+
+/* Horizontal padding leaves room for the tilted h1's bounding box, which is
+   wider than the text itself and otherwise overflows on narrow phones. */
+.masthead { text-align: center; padding: 8px 8px 22px; }
+
+.masthead h1 {
+  display: inline-block;
+  background: var(--paper);
+  border: var(--edge);
+  border-radius: var(--radius);
+  box-shadow: var(--pop);
+  padding: 12px 22px;
+  transform: rotate(-1.5deg);
+}
+
+.masthead .sub { margin-top: 16px; }
+
+/* ---------- scoreboard ---------- */
+
+.scoreboard {
+  background: var(--paper);
+  border: var(--edge);
+  border-radius: var(--radius);
+  box-shadow: var(--pop);
+  padding: 16px;
+  margin-bottom: 24px;
+}
+
+.scoreboard-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.scoreboard-row strong { font-size: 21px; font-weight: 900; }
+
+.bar {
+  height: 18px;
+  background: #EFE3C8;
+  border: var(--edge);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  width: 0;
+  background: var(--green);
+  border-right: 3px solid var(--ink);
+  border-radius: 999px 0 0 999px;
+  transition: width .45s cubic-bezier(.34, 1.56, .64, 1);
+}
+
+.bar-fill.empty { border-right: 0; }
+.bar-fill.full  { border-right: 0; border-radius: 999px; }
+
+/* ---------- figure cards ---------- */
+
+.cards { display: grid; gap: 16px; }
+
+.card {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  background: var(--paper);
+  border: var(--edge);
+  border-radius: var(--radius);
+  box-shadow: var(--pop);
+  padding: 16px;
+  cursor: pointer;
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+
+.card:hover  { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 var(--ink); }
+.card:active { transform: translate(2px, 2px);  box-shadow: var(--pop-sm); }
+
+.card-top { display: flex; align-items: center; gap: 14px; }
+
+.badge {
+  flex: 0 0 auto;
+  width: 60px;
+  height: 60px;
+  display: grid;
+  place-items: center;
+  font-size: 32px;
+  line-height: 1;
+  background: var(--accent);
+  border: var(--edge);
+  border-radius: 50%;
+  box-shadow: var(--pop-sm);
+}
+
+.card-title { flex: 1 1 auto; min-width: 0; }
+.card-title h3 { margin-bottom: 2px; }
+
+.card-meta { font-size: 14px; font-weight: 800; color: var(--muted); }
+
+.card.is-found { background: #EFFBF2; }
+.card.is-found .badge { background: var(--green); }
+
+.tick {
+  flex: 0 0 auto;
+  font-size: 26px;
+  font-weight: 900;
+  color: var(--green);
+  -webkit-text-stroke: 1.5px var(--ink);
+}
+
+.stars { letter-spacing: 2px; font-size: 15px; }
+
+/* ---------- buttons ---------- */
+
+.btn {
+  display: block;
+  width: 100%;
+  font: inherit;
+  font-weight: 900;
+  font-size: 18px;
+  color: var(--ink);
+  background: var(--paper);
+  border: var(--edge);
+  border-radius: var(--radius);
+  box-shadow: var(--pop);
+  padding: 15px 18px;
+  cursor: pointer;
+  transition: transform .1s ease, box-shadow .1s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn:active { transform: translate(3px, 3px); box-shadow: 2px 2px 0 var(--ink); }
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: .5;
+  transform: none;
+  box-shadow: var(--pop-sm);
+}
+
+.btn-clue  { background: var(--gold); }
+.btn-found { background: var(--green); font-size: 21px; padding: 18px; }
+.btn-ghost {
+  background: transparent;
+  border-style: dashed;
+  box-shadow: none;
+  font-size: 15px;
+  color: var(--muted);
+  padding: 11px;
+}
+.btn-ghost:active { transform: none; box-shadow: none; }
+.btn-danger { background: var(--pink); }
+
+.btn-back {
+  width: auto;
+  padding: 9px 16px;
+  font-size: 15px;
+  box-shadow: var(--pop-sm);
+  margin-bottom: 18px;
+}
+
+.btn-row { display: flex; gap: 12px; }
+.btn-row .btn { flex: 1; }
+
+.stack { display: grid; gap: 12px; margin-top: 20px; }
+
+/* ---------- figure detail ---------- */
+
+.hero { text-align: center; margin-bottom: 22px; }
+
+.hero .badge {
+  width: 92px;
+  height: 92px;
+  font-size: 50px;
+  margin: 0 auto 14px;
+  box-shadow: var(--pop);
+}
+
+.teaser {
+  background: var(--paper);
+  border: var(--edge);
+  border-radius: var(--radius);
+  box-shadow: var(--pop);
+  padding: 18px;
+  font-size: 18px;
+  font-weight: 700;
+  font-style: italic;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.clue-list { display: grid; gap: 12px; margin-bottom: 20px; }
+
+.clue {
+  background: var(--paper);
+  border: var(--edge);
+  border-left: 10px solid var(--accent);
+  border-radius: 14px;
+  box-shadow: var(--pop-sm);
+  padding: 13px 15px;
+  animation: drop .35s cubic-bezier(.34, 1.56, .64, 1);
+}
+
+.clue-n {
+  display: block;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 3px;
+}
+
+@keyframes drop {
+  from { opacity: 0; transform: translateY(-10px) scale(.97); }
+  to   { opacity: 1; transform: none; }
+}
+
+.locked {
+  text-align: center;
+  color: var(--muted);
+  font-weight: 800;
+  font-size: 15px;
+  padding: 10px 0 2px;
+}
+
+/* ---------- found / win ---------- */
+
+.found-box {
+  background: var(--green);
+  border: var(--edge);
+  border-radius: var(--radius);
+  box-shadow: var(--pop);
+  padding: 22px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.found-box .big { font-size: 46px; line-height: 1; margin-bottom: 8px; }
+
+.win {
+  background: var(--gold);
+  border: var(--edge);
+  border-radius: var(--radius);
+  box-shadow: var(--pop);
+  padding: 24px;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.win .big  { font-size: 54px; line-height: 1; }
+.win .rank { font-size: clamp(24px, 6.5vw, 32px); font-weight: 900; margin: 6px 0 4px; }
+
+/* ---------- modal ---------- */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(36, 28, 19, .55);
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  z-index: 50;
+}
+
+.modal {
+  background: var(--paper);
+  border: var(--edge);
+  border-radius: var(--radius);
+  box-shadow: var(--pop);
+  padding: 22px;
+  max-width: 380px;
+  width: 100%;
+  text-align: center;
+}
+
+.modal h2 { margin-bottom: 10px; }
+
+/* ---------- confetti ---------- */
+
+.confetti {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 60;
+}
+
+.confetti i {
+  position: absolute;
+  top: -24px;
+  width: 11px;
+  height: 15px;
+  border: 1.5px solid var(--ink);
+  border-radius: 2px;
+  animation: fall linear forwards;
+}
+
+@keyframes fall {
+  to { transform: translateY(105vh) rotate(760deg); opacity: .85; }
+}
+
+/* ---------- footer ---------- */
+
+.footer { margin-top: 30px; text-align: center; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+  .confetti { display: none; }
+}
