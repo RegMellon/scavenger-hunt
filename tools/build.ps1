@@ -141,6 +141,24 @@ $banner = @(
 $json = $hunt | ConvertTo-Json -Depth 8 -Compress
 Set-Content -Path $dataPath -Value "$banner`n$prefix$json;`n" -Encoding utf8NoBOM
 
+# Stamp each asset's content hash into index.html. GitHub Pages serves these with
+# max-age=600, so without a changing URL a browser happily shows clues from an
+# earlier build long after a push.
+$indexPath = Join-Path $root 'index.html'
+if (Test-Path $indexPath) {
+    $html = Get-Content $indexPath -Raw
+    foreach ($asset in 'styles.css', 'app.js', 'data.js') {
+        $assetPath = Join-Path $root $asset
+        if (-not (Test-Path $assetPath)) { continue }
+        $stamp = [Convert]::ToHexString(
+            [Security.Cryptography.SHA256]::HashData([IO.File]::ReadAllBytes($assetPath))
+        ).ToLowerInvariant().Substring(0, 8)
+        $pattern = '(?<=(?:src|href)="' + [regex]::Escape($asset) + '\?v=)[0-9a-z]+'
+        $html = [regex]::Replace($html, $pattern, $stamp)
+    }
+    Set-Content -Path $indexPath -Value $html -Encoding utf8NoBOM -NoNewline
+}
+
 $clueCount = ($src.figures | Measure-Object -Property { $_.clues.Count } -Sum).Sum
 "Wrote $dataPath"
 "  $($src.figures.Count) figures, $clueCount clues, all scrambled."

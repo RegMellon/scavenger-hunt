@@ -7,7 +7,9 @@
 <meta name="description" content="Four figures are hidden in this house. Find them with as few clues as you can.">
 <meta name="theme-color" content="#FFF3D6">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔍</text></svg>">
-<link rel="stylesheet" href="styles.css">
+<!-- The ?v= stamps are rewritten by tools/build.ps1 on every build. Without them a
+     browser can keep serving a cached data.js and show clues from a previous build. -->
+<link rel="stylesheet" href="styles.css?v=9baf0443">
 </head>
 <body>
 
@@ -22,7 +24,7 @@
 
 <div id="confetti" class="confetti" aria-hidden="true"></div>
 
-<script src="data.js"></script>
-<script src="app.js"></script>
+<script src="data.js?v=3a23617f"></script>
+<script src="app.js?v=98b94cf0"></script>
 </body>
 </html>
