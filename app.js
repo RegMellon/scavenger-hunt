@@ -133,10 +133,9 @@
   // letter. Everything after it is ordinary prose.
   function clueHtml(text) {
     var split = text.indexOf('\n');
-    if (split === -1) return esc(text);
+    var head = split === -1 ? text : text.slice(0, split);
+    var rest = split === -1 ? '' : text.slice(split);
 
-    var head = text.slice(0, split);
-    var rest = text.slice(split);
     if (!/[a-z]/.test(head) && /[A-Z0-9]/.test(head)) {
       return '<span class="clue-cipher">' + esc(head) + '</span>' + esc(rest);
     }
