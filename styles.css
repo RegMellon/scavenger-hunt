@@ -259,8 +259,9 @@ p:last-child { margin-bottom: 0; }
   border-radius: 14px;
   box-shadow: var(--pop-sm);
   padding: 13px 15px;
-  /* Clues are puzzles laid out over several lines; keep the author's line breaks. */
-  white-space: pre-line;
+  /* Clues are puzzles. pre-wrap, not pre-line: pre-line collapses runs of spaces,
+     and the gaps between cipher words are load-bearing. */
+  white-space: pre-wrap;
   animation: drop .35s cubic-bezier(.34, 1.56, .64, 1);
 }
 
