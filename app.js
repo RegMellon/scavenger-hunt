@@ -80,19 +80,28 @@
     return Number.isInteger(minutes) ? String(minutes) : minutes.toFixed(1);
   }
 
+  // Thresholds are a percentage of the clues on offer, not absolute counts, so the
+  // ranks stay meaningful whether the hunt has one figure or ten.
   var RANKS = [
-    { max: 2,  title: 'Legendary Seeker',     line: 'Barely needed a single hint. That was unreal.' },
-    { max: 6,  title: 'Master Detective',     line: 'Sharp eyes and a sharper brain.' },
-    { max: 11, title: 'Eagle Eye',            line: 'Solid hunting from start to finish.' },
-    { max: 16, title: 'Determined Explorer',  line: 'You worked for every single one of them.' },
-    { max: 99, title: 'Never Gave Up',        line: 'Four out of four. That is the part that counts.' }
+    { pct: 0,   title: 'Legendary Seeker',    line: 'Cracked it with no help whatsoever. That is genuinely unreal.' },
+    { pct: 20,  title: 'Master Codebreaker',  line: 'Barely needed us. Sharp eyes and a sharper brain.' },
+    { pct: 40,  title: 'Eagle Eye',           line: 'Solid hunting from start to finish.' },
+    { pct: 60,  title: 'Determined Explorer', line: 'You worked for that one, and you got it.' },
+    { pct: 100, title: 'Never Gave Up',       line: 'You found it. That is the part that counts.' }
   ];
 
-  function rankFor(totalClues) {
+  // Compared as integers (used * 100 vs pct * available) so a threshold never
+  // turns on a float rounding accident.
+  function rankFor(cluesUsed, cluesAvailable) {
+    if (cluesAvailable <= 0) return RANKS[0];
     for (var i = 0; i < RANKS.length; i++) {
-      if (totalClues <= RANKS[i].max) return RANKS[i];
+      if (cluesUsed * 100 <= RANKS[i].pct * cluesAvailable) return RANKS[i];
     }
     return RANKS[RANKS.length - 1];
+  }
+
+  function totalCluesAvailable() {
+    return HUNT.figures.reduce(function (n, f) { return n + f.c.length; }, 0);
   }
 
   // --- helpers ------------------------------------------------------------
@@ -115,8 +124,23 @@
   }
 
   function accentVar(color) {
-    var known = { teal: 1, gold: 1, pink: 1, purple: 1, green: 1 };
+    var known = { blue: 1, teal: 1, gold: 1, pink: 1, purple: 1, green: 1 };
     return 'var(--' + (known[color] ? color : 'teal') + ')';
+  }
+
+  // A clue's first line is set in monospace when it is a cipher — all caps,
+  // digits, dots and spaces, nothing lowercase — so it can be read letter by
+  // letter. Everything after it is ordinary prose.
+  function clueHtml(text) {
+    var split = text.indexOf('\n');
+    if (split === -1) return esc(text);
+
+    var head = text.slice(0, split);
+    var rest = text.slice(split);
+    if (!/[a-z]/.test(head) && /[A-Z0-9]/.test(head)) {
+      return '<span class="clue-cipher">' + esc(head) + '</span>' + esc(rest);
+    }
+    return esc(text);
   }
 
   // --- confetti -----------------------------------------------------------
@@ -179,13 +203,16 @@
 
     var win = '';
     if (found === total) {
-      var rank = rankFor(cluesUsed);
+      var rank = rankFor(cluesUsed, totalCluesAvailable());
+      var summary = total === 1
+        ? (cluesUsed === 0 ? 'Found with no clues at all' : 'Found with ' + plural(cluesUsed, 'clue', 'clues'))
+        : 'All ' + total + ' found using ' + plural(cluesUsed, 'clue', 'clues');
       win = '' +
         '<div class="win">' +
           '<div class="big">🏆</div>' +
           '<div class="rank">' + esc(rank.title) + '</div>' +
           '<p><strong>' + esc(rank.line) + '</strong></p>' +
-          '<p class="sub">All ' + total + ' found using ' + plural(cluesUsed, 'clue', 'clues') +
+          '<p class="sub">' + summary +
             ' · ' + formatMinutes(cluesUsed) + ' minutes of reading</p>' +
         '</div>';
     }
@@ -221,7 +248,7 @@
       clues += '' +
         '<div class="clue">' +
           '<span class="clue-n">Clue ' + (i + 1) + ' of ' + totalClues + '</span>' +
-          esc(reveal(fig.c[i])) +
+          clueHtml(reveal(fig.c[i])) +
         '</div>';
     }
 

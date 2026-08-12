@@ -1,20 +1,26 @@
 # Scavenger Hunt
 
-A little static website for a hide-and-seek game around the house. Four figures are
-hidden; each one has five clues that get progressively less subtle. The site keeps
-score by counting how few clues you needed.
+A little static website for a hide-and-seek game around the house. A figure is hidden
+somewhere, and five clues lead to it — as **puzzles** that get easier as you go, not
+plain hints. The site keeps score by counting how few clues you needed.
+
+The current hunt runs one figure with an Atbash cipher, an A1Z26 number cipher, a pair
+of anagrams, a riddle, and finally plain English. Nothing in the engine assumes one
+figure — add more to `clues.json` and the hub, progress bar and ranks all follow.
 
 No accounts, no server, no build step for players — just open the page.
 
 ## How it plays
 
-1. The hub lists all four figures. Each shows a **teaser** — a taunt, basically, with
-   no actual information in it.
-2. Tap a figure to open it. You can take clues one at a time: **1 → 5**, vague to obvious.
-   Clue 5 always gives the hiding place away, so nobody stays stuck.
+1. The hub lists the figures. Each shows a **teaser** — a taunt, basically, with no
+   actual information in it.
+2. Tap a figure to open it. Clues come one at a time, **1 → 5**. Clue 1 is the hardest
+   puzzle and the vaguest; each one after it is easier to crack *and* more specific.
+   Clue 5 is plain English and gives the spot away, so nobody stays stuck.
 3. Tap **I FOUND IT!** when you've got it. Confetti and stars.
-4. Find all four to unlock a rank based on your total clues used, from *Never Gave Up*
-   up to *Legendary Seeker*.
+4. Finishing unlocks a rank based on how few clues you burned, from *Never Gave Up*
+   up to *Legendary Seeker*. Thresholds are a percentage of the clues on offer, so they
+   stay meaningful at any figure count.
 
 **Every clue costs 2.5 minutes of reading time.** The cost is shown on the clue button before
 they commit to it, and the running total sits on the scoreboard — so taking a fourth clue is

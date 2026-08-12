@@ -6,6 +6,7 @@
   --paper:   #FFFFFF;
   --muted:   #7A6A55;
 
+  --blue:    #4B8DF8;
   --teal:    #35C4B5;
   --gold:    #FFC93C;
   --pink:    #FF6B9D;
@@ -258,7 +259,17 @@ p:last-child { margin-bottom: 0; }
   border-radius: 14px;
   box-shadow: var(--pop-sm);
   padding: 13px 15px;
+  /* Clues are puzzles laid out over several lines; keep the author's line breaks. */
+  white-space: pre-line;
   animation: drop .35s cubic-bezier(.34, 1.56, .64, 1);
+}
+
+/* Cipher lines need to be read character by character, so give them room. */
+.clue-cipher {
+  font-family: "Cascadia Mono", Consolas, "SF Mono", Menlo, monospace;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: .06em;
 }
 
 .clue-n {
